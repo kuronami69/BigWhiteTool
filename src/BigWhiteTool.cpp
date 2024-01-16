@@ -192,11 +192,19 @@ int main(int argc, char *argv[]) {
                 }
                 ImGui::EndMainMenuBar();
             }
+
             if (ShowDemoWindow) ImGui::ShowDemoWindow();
+
             if (ShowUE4Dumper) Menu::ShowUE4DumperWindow();
+
             if (ShowFindData) Menu::ShowFindDataWindow();
+
             if (ShowDebugMatrix) Menu::ShowDebugMatrixWindow();
+
             if (ShowDebugDumper) Menu::ShowDebugDumperWindow();
+
+
+
         }
 
 

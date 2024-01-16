@@ -11,8 +11,6 @@
 #include <Tool.h>
 #include <DrawPlayer.h>
 
-#include "opencv2/opencv_modules.hpp"
-
 
 bool ShowDemoWindow = false;
 bool ShowUE4Dumper = false;
