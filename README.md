@@ -8,3 +8,6 @@ SDK保存路径/storage/emulated/0/A_BigWhiteTool/SDK
 获取Gname时间可能需要很久 会卡住一两分钟
 
 代码写的很烂 边学C++边写的凑合看
+
+编译方法：
+使用CLion打开 修改 CMakeLists.txt文件的NDK路径
