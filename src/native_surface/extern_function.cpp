@@ -9,6 +9,7 @@
 #include "native_surface/aosp/native_surface_12.h"
 #include "native_surface/aosp/native_surface_12_1.h"
 #include "native_surface/aosp/native_surface_13.h"
+#include "native_surface/aosp/native_surface_14.h"
 #include "native_surface/aosp/dev.h"
 
 // 动态库方案
@@ -19,7 +20,14 @@ ExternFunction::ExternFunction() {
     if (!handle) {
 //        handle = dlblob(&native_surface_test, sizeof(native_surface_test)); // 测试
         printf("android api level:%d\n", get_android_api_level());
-        if (get_android_api_level() == 33) { // 安卓13支持
+        if (get_android_api_level() == 34) { // 安卓14支持
+            exec_native_surface("settings put global block_untrusted_touches 0");
+#ifdef __aarch64__
+            handle = dlblob(&native_surface_14_64, sizeof(native_surface_14_64)); // 64位支持
+#else
+            handle = dlblob(&native_surface_14_32, sizeof(native_surface_14_32)); // 32位支持 <<-- 其实很没必要 未测试
+#endif
+        } else if (get_android_api_level() == 33) { // 安卓13支持
             exec_native_surface("settings put global block_untrusted_touches 0");
 #ifdef __aarch64__
             handle = dlblob(&native_surface_13_64, sizeof(native_surface_13_64)); // 64位支持

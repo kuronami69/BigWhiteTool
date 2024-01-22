@@ -138,50 +138,54 @@ int main(int argc, char *argv[]) {
                             }
                             DumpSDK::DumpUObject();
                         }
-                        if (ImGui::MenuItem("输出暗区偏移")) {
+                        if (ImGui::MenuItem("输出aq偏移")) {
                             std::string filePath = "/storage/emulated/0/A_BigWhiteTool/SDK/Class.cpp";
+                            std::ifstream file(filePath);
+                            if (file.good()){
 
-                            //手持
-                            cout << "手持武器数据" <<endl;
-                            DumpSDK::findClass(filePath, "ASGCharacter", "CharacterWeaponManagerComponent");
-                            DumpSDK::findClass(filePath, "USGCharacterWeaponManagerComponent", "CurrentWeapon");
-                            DumpSDK::findClass(filePath, "ASGInventory", "CurrentWeapon");
-                            DumpSDK::findClass(filePath, "ABPC_Weapon_UamEmptyHand_C", "SGWeaponImpact");
-                            DumpSDK::findClass(filePath, "USGWeaponImpactComponent", "OwnerWeapon");
+                                //手持
+                                cout << "手持武器数据" <<endl;
+                                DumpSDK::findClass(filePath, "ASGCharacter", "CharacterWeaponManagerComponent");
+                                DumpSDK::findClass(filePath, "USGCharacterWeaponManagerComponent", "CurrentWeapon");
+                                DumpSDK::findClass(filePath, "ASGInventory", "CurrentWeapon");
+                                DumpSDK::findClass(filePath, "ABPC_Weapon_UamEmptyHand_C", "SGWeaponImpact");
+                                DumpSDK::findClass(filePath, "USGWeaponImpactComponent", "OwnerWeapon");
 
-                            //负重和价值
-                            cout << "负重价值数据" <<endl;
-                            DumpSDK::findClass(filePath, "ASGCharacter", "CharacterInventoryManagerComponent");
-                            DumpSDK::findClass(filePath, "USGCharacterInventoryManagerComponent", "TotalWeight");
-                            DumpSDK::findClass(filePath, "USGCharacterInventoryManagerComponent", "TotalInventoryValue");
+                                //负重和价值
+                                cout << "负重价值数据" <<endl;
+                                DumpSDK::findClass(filePath, "ASGCharacter", "CharacterInventoryManagerComponent");
+                                DumpSDK::findClass(filePath, "USGCharacterInventoryManagerComponent", "TotalWeight");
+                                DumpSDK::findClass(filePath, "USGCharacterInventoryManagerComponent", "TotalInventoryValue");
 
-                            //护甲等级
-                            cout << "护甲等级数据" <<endl;
-                            DumpSDK::findClass(filePath, "ASGCharacter", "CharacterArmorManagerComponent");
-                            DumpSDK::findClass(filePath, "USGCharacterArmorManagerComponent", "ArmorList");
-                            DumpSDK::findClass(filePath, "ASGInventory", "ArmorLevel");
+                                //护甲等级
+                                cout << "护甲等级数据" <<endl;
+                                DumpSDK::findClass(filePath, "ASGCharacter", "CharacterArmorManagerComponent");
+                                DumpSDK::findClass(filePath, "USGCharacterArmorManagerComponent", "ArmorList");
+                                DumpSDK::findClass(filePath, "ASGInventory", "ArmorLevel");
 
-                            //骨骼数据
-                            cout << "护甲等级数据" <<endl;
-                            DumpSDK::findClass(filePath, "ACharacter", "Mesh");
-                            cout << "过滤" <<endl;
-                            DumpSDK::findClass(filePath, "ACharacter", "CrouchedEyeHeight");
+                                //骨骼数据
+                                cout << "护甲等级数据" <<endl;
+                                DumpSDK::findClass(filePath, "ACharacter", "Mesh");
+                                cout << "过滤" <<endl;
+                                DumpSDK::findClass(filePath, "ACharacter", "CrouchedEyeHeight");
 
-                            cout << "PlayerState" <<endl;
-                            DumpSDK::findClass(filePath, "APawn", "PlayerState");
+                                cout << "PlayerState" <<endl;
+                                DumpSDK::findClass(filePath, "APawn", "PlayerState");
 
-                            cout << "TeamIndex" <<endl;
-                            DumpSDK::findClass(filePath, "ASGPlayerState", "TeamIndex");
+                                cout << "TeamIndex" <<endl;
+                                DumpSDK::findClass(filePath, "ASGPlayerState", "TeamIndex");
 
-                            cout << "RootComponent" <<endl;
-                            DumpSDK::findClass(filePath, "AActor", "RootComponent");
+                                cout << "RootComponent" <<endl;
+                                DumpSDK::findClass(filePath, "AActor", "RootComponent");
 
-                            cout << "坐标偏移" <<endl;//
-                            DumpSDK::findClass(filePath, "USceneComponent", "RelativeLocation");
-                            cout << "自身" <<endl;//
-                            DumpSDK::findClass(filePath, "APlayerController", "AcknowledgedPawn");
+                                cout << "坐标偏移" <<endl;//
+                                DumpSDK::findClass(filePath, "USceneComponent", "RelativeLocation");
+                                cout << "自身" <<endl;//
+                                DumpSDK::findClass(filePath, "APlayerController", "AcknowledgedPawn");
 
-
+                            }else{
+                                cout << "请先DumpSDK"<<endl;
+                            }
                         }
                         ImGui::EndMenu();
                     }
