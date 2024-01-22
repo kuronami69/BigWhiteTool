@@ -1,4 +1,6 @@
 # BigWhiteTool
+电报
+https://t.me/BigWhiteHack
 ![image](https://github.com/BigWhite666/BigWhiteTool/assets/141211205/00623027-c9d0-4f68-b38a-4bb22e98ccb7)
 ![image](https://github.com/BigWhite666/BigWhiteTool/assets/141211205/6f166859-6132-4930-8e6b-03cf8ce546ba)
 
