@@ -1,6 +1,6 @@
-#include "engine.h"
-#include "Android_Read/Android_Read.h"
-#include "generic.h"
+#include "Android_dump/engine.h"
+#include "Android_dump/generic.h"
+#include "Android_Read/BigWhiteRead.h"
 
 
 
@@ -17,7 +17,7 @@ UE_UObject* UE_UObject::GetOuter()
 // 获取对象名称
 string UE_UObject::GetName()
 {
-	uint32_t NameId = XY_TRead<uint32_t>(this + Offsets.UObject.Name);
+    uint32_t NameId = XY_TRead<uint32_t>(this + Offsets.UObject.Name);
     if (isUE423){
         return NamePoolData->GetName(NameId);
     }else{

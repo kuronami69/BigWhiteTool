@@ -1,36 +1,50 @@
-//
-// Created by 泓清 on 2022/8/26.
-//
-
 #include "Android_draw/draw.h"
 
 // Var
 EGLDisplay display = EGL_NO_DISPLAY;
 EGLConfig config;
 EGLSurface surface = EGL_NO_SURFACE;
-ANativeWindow *native_window;
-ExternFunction externFunction;
 EGLContext context = EGL_NO_CONTEXT;
-MDisplayInfo displayInfo;
+
+ANativeWindow *native_window;
+//
+int native_window_screen_x = 0;
+int native_window_screen_y = 0;
+android::ANativeWindowCreator::DisplayInfo displayInfo{0};
 uint32_t orientation = 0;
 bool g_Initialized = false;
+ImGuiWindow *g_window = nullptr;
 
-bool initDraw(bool log) {
-    screen_config();
+
+
+
+bool initGUI_draw(uint32_t _screen_x, uint32_t _screen_y, bool log) {
     orientation = displayInfo.orientation;
-    return initDraw(displayInfo.width, displayInfo.height, log);
-}
 
-bool initDraw(uint32_t _screen_x, uint32_t _screen_y, bool log) {
-    if (!init_egl(_screen_x, _screen_y, log)) {
+    #if defined(USE_OPENGL)
+        if (!init_egl(_screen_x, _screen_y, log)) {
+            return false;
+        }
+    #else
+        InitVulkan();
+        SetupVulkan();
+        ::native_window = android::ANativeWindowCreator::Create("AImGui", _screen_x, _screen_y, true);
+        SetupVulkanWindow(::native_window, (int) _screen_x, (int) _screen_y);
+    #endif
+    if (!ImGui_init()) {
         return false;
     }
-    return ImGui_init();
+
+    #ifndef USE_OPENGL
+        UploadFonts();
+    #endif
+
+    return true;
 }
 
 bool init_egl(uint32_t _screen_x, uint32_t _screen_y, bool log) {
-    native_window = externFunction.createNativeWindow("Ssage",
-                                                      _screen_x, _screen_y, false);
+    ::native_window = android::ANativeWindowCreator::Create("AImGui", _screen_x, _screen_y, true);
+
     ANativeWindow_acquire(native_window);
     display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (display == EGL_NO_DISPLAY) {
@@ -66,7 +80,7 @@ bool init_egl(uint32_t _screen_x, uint32_t _screen_y, bool log) {
     };
 
     if (log) {
-        printf("num_config=%d\n", num_config);
+        printf("num_config = %d\n", num_config);
     }
     if (eglChooseConfig(display, attribList, &config, 1, &num_config) != EGL_TRUE) {
         printf("eglChooseConfig  error=%u\n", glGetError());
@@ -106,7 +120,7 @@ bool init_egl(uint32_t _screen_x, uint32_t _screen_y, bool log) {
 }
 
 void screen_config() {
-    displayInfo = externFunction.getDisplayInfo();
+    displayInfo = android::ANativeWindowCreator::GetDisplayInfo();
 }
 
 bool ImGui_init() {
@@ -115,37 +129,46 @@ bool ImGui_init() {
     }
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    io.IniFilename = "";
     ImGui::StyleColorsDark();
     ImGui_ImplAndroid_Init(native_window);
-    ImGui_ImplOpenGL3_Init("#version 300 es");
-
-    ImFontConfig font_cfg;
-    font_cfg.SizePixels = 30.0f;
-    io.Fonts->AddFontFromMemoryTTF((void *)OPPOSans_H, OPPOSans_H_size, 30.0f, &font_cfg, io.Fonts->GetGlyphRangesChineseFull());
-
-    ImGui::GetStyle().ScaleAllSizes(4.0f);//ImGui控件样式大小样式
-    g_Initialized = true;
-    return g_Initialized;
+    #if defined(USE_OPENGL)
+        ImGui_ImplOpenGL3_Init("#version 300 es");
+    #endif
+    ImGuiIO &io = ImGui::GetIO();
+    io.IniFilename = NULL;
+    static ImFontConfig font_cfg;
+    font_cfg.SizePixels = 22.0f;
+    io.Fonts->AddFontFromMemoryTTF((void *) OPPOSans_H, OPPOSans_H_size, 32.0f, &font_cfg, io.Fonts->GetGlyphRangesChineseFull());
+    io.Fonts->AddFontDefault(&font_cfg);
+    ImGui::GetStyle().ScaleAllSizes(3.0f);
+    ::g_Initialized = true;
+    return true;
 }
 
 void drawBegin() {
-    //screen_config();//不注释这里有BUG换屏幕方向会闪退 所以先注释掉了
-    if (orientation != displayInfo.orientation) {
-//        externFunction.setSurfaceWH(displayInfo.width, displayInfo.height);
-        shutdown();
-        initDraw();
-        orientation = displayInfo.orientation;
-        cout << " width:" << displayInfo.width << " height:" << displayInfo.height << " orientation:"
-             << displayInfo.orientation << endl;
+    screen_config();
+    if (::orientation != displayInfo.orientation) {
+        ::orientation = displayInfo.orientation;
+        UpdateScreenData(displayInfo.width, displayInfo.height, displayInfo.orientation);
+        //touchEnd();
+        g_window->Pos.x = 100;
+        g_window->Pos.y = 125;
+        //Init_touch_config();
+
+        //cout << " width:" << displayInfo.width << " height:" << displayInfo.height << " orientation:" << displayInfo.orientation << endl;
     }
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplAndroid_NewFrame((int32_t) displayInfo.width, (int32_t) displayInfo.height);
+
+    #ifdef USE_OPENGL
+        ImGui_ImplOpenGL3_NewFrame();
+    #else
+        ImGui_ImplVulkan_NewFrame();
+    #endif
+    ImGui_ImplAndroid_NewFrame(native_window_screen_x, native_window_screen_y);
     ImGui::NewFrame();
 }
 
 void drawEnd() {
+    /*
     ImGuiIO &io = ImGui::GetIO();
     glViewport(0.0f, 0.0f, (int) io.DisplaySize.x, (int) io.DisplaySize.y);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -154,10 +177,19 @@ void drawEnd() {
     if (display == EGL_NO_DISPLAY) {
         return;
     }
+    */
     ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    eglSwapBuffers(display, surface);
+
+    #ifdef USE_OPENGL
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        eglSwapBuffers(display, surface);
+    #else
+        FrameRender(ImGui::GetDrawData());
+        FramePresent();
+    #endif
 }
+
 
 
 void shutdown() {
@@ -165,22 +197,36 @@ void shutdown() {
         return;
     }
     // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
+    #ifdef USE_OPENGL
+        ImGui_ImplOpenGL3_Shutdown();
+    #else
+        DeviceWait();
+        ImGui_ImplVulkan_Shutdown();
+    #endif
     ImGui_ImplAndroid_Shutdown();
     ImGui::DestroyContext();
-    if (display != EGL_NO_DISPLAY) {
-        eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-        if (context != EGL_NO_CONTEXT) {
-            eglDestroyContext(display, context);
+
+
+    #ifdef USE_OPENGL
+        if (display != EGL_NO_DISPLAY) {
+            eglMakeCz`urrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+            if (context != EGL_NO_CONTEXT) {
+                eglDestroyContext(display, context);
+            }
+            if (surface != EGL_NO_SURFACE) {
+                eglDestroySurface(display, surface);
+            }
+            eglTerminate(display);
         }
-        if (surface != EGL_NO_SURFACE) {
-            eglDestroySurface(display, surface);
-        }
-        eglTerminate(display);
-    }
-    display = EGL_NO_DISPLAY;
-    context = EGL_NO_CONTEXT;
-    surface = EGL_NO_SURFACE;
+        display = EGL_NO_DISPLAY;
+        context = EGL_NO_CONTEXT;
+        surface = EGL_NO_SURFACE;
+    #else
+        CleanupVulkanWindow();
+        CleanupVulkan();
+    #endif
+
     ANativeWindow_release(native_window);
-    g_Initialized = false;
+    android::ANativeWindowCreator::Destroy(native_window);
+    ::g_Initialized = false;
 }

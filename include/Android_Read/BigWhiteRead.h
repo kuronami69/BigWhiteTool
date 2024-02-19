@@ -1,5 +1,8 @@
-#ifndef NATIVESURFACE_MEMREAD_H
-#define NATIVESURFACE_MEMREAD_H
+//
+// Created by Administrator on 2024/2/2.
+//
+
+#ifndef ANDROIDIMGUI_BIGWHITEREAD_H
 
 #include <stdio.h>
 #include <unistd.h>
@@ -28,65 +31,32 @@
 #include <string>
 #include <codecvt>
 #include <dlfcn.h>
-// 定义圆周率
-#define PI 3.141592653589793238
-typedef unsigned int ADDRESS;
-typedef char PACKAGENAME;
+#define ANDROIDIMGUI_BIGWHITEREAD_H
 typedef unsigned short UTF16;
 typedef char UTF8;
 typedef uintptr_t kaddr;
 
-extern int BigWhite_pid;
+extern int BigWhitePid;
+extern int ReadMode;
+uint64_t GetLibBase(int pid);
+uint64_t GetProcessBase(int pid,bool mode);
+// 获取指针
+uint64_t GetAddr(uint64_t addr);
+//读地址
+bool ReadAddr(uintptr_t address, void *buffer, size_t size);
+//读四字节整形
+int GetDword(uintptr_t addr);
+//读浮点型
+float GetFloat(uintptr_t addr);
+//写四字节整形
+int WriteDword(uintptr_t addr, int value);
+//写浮点型
+float WriteFloat(uintptr_t addr, float value);
 
-// syscall内存读写
-extern int BigWhite_process_vm_readv_syscall;
-extern int BigWhite_process_vm_writev_syscall;
-
-ssize_t BigWhite_process_v(pid_t __pid, const struct iovec *__local_iov, unsigned long __local_iov_count,
-                  const struct iovec *__remote_iov, unsigned long __remote_iov_count,
-                  unsigned long __flags, bool iswrite);
-
-int BigWhite_getProcessID(const char *packageName);
-
-bool BigWhite_mem_addr_virtophy(unsigned long vaddr);
-
+void BigWhiteinit();
 // 进程读写内存
 bool BigWhite_pvm(void *address, void *buffer, size_t size, bool iswrite);
 
-// 读取内存
-bool BigWhite_vm_readv(unsigned long address, void *buffer, size_t size);
-// 写入内存
-bool BigWhite_vm_writev(unsigned long address, void *buffer, size_t size);
-// 获取F类内存
-float BigWhite_GetFloat(unsigned long addr);
-
-// 获取D类内存
-int BigWhite_GetDword(unsigned long addr);
-
-// 获取指针(32位游戏)
-unsigned int BigWhite_GetPtr32(unsigned int addr);
-// 获取指针(64位游戏)
-unsigned long BigWhite_GetPtr64(unsigned long addr);
-
-// 获取指针(64位游戏) 无过缺页
-unsigned long BigWhite_getPtr641(unsigned long addr);
-// 写入D类内存
-void BigWhite_WriteDword(unsigned long addr, int data);
-
-void BigWhite_WriteFloat(unsigned long addr, float data);
-
-// 获取进程
-int BigWhite_GetPID(const char *packageName);
-
-// 获取模块基址
-unsigned long BigWhite_GetModuleBase(int pid, const char *module_name);
-
-//获取基址
-unsigned long BigWhite_GetProcessBaseAddress(int pid);
-
-
-// 读取字符信息
-void BigWhite_GetUTF8(UTF8 * buf, unsigned long namepy);
 
 
 template<typename T>
@@ -104,4 +74,4 @@ T XY_TRead(kaddr address) {
     return data;
 }
 
-#endif
+#endif //ANDROIDIMGUI_BIGWHITEREAD_H

@@ -1,7 +1,7 @@
 #include <sys/stat.h>
-#include "dumper.h"
-#include "generic.h"
-#include "engine.h"
+#include "Android_dump/dumper.h"
+#include "Android_dump/generic.h"
+#include "Android_dump/engine.h"
 
 // 初始化Dumper
 void Dumper::Init(uint64_t Base,uint64_t GName, uint64_t GObject)

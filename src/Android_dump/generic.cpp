@@ -1,5 +1,5 @@
-#include "generic.h"
-#include "Android_Read/Android_Read.h"
+#include "Android_dump/generic.h"
+#include "Android_Read/BigWhiteRead.h"
 
 #include<codecvt>
 
@@ -18,7 +18,6 @@ string FNamePool::GetName(uint32_t index)
 {
     unsigned int Block = index >> 16;
     unsigned short int Offset = index & 65535;
-
     uintptr_t FNamePool = AddrGNames;
 
     auto NamePoolChunk = XY_TRead<uintptr_t>(FNamePool+0x40 + (Block * 0x8));
@@ -52,6 +51,7 @@ string FNamePool::GetName_Old(uint32_t index)
     }
     return {};
 }
+
 
 uint32_t TUObjectArray::GetNumChunks()
 {
